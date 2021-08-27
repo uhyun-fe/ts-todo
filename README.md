@@ -15,7 +15,7 @@ npm start
 
 ```
 npx create-react-app ts-todo --template typescript
-npm install styled-components @types/styled-components styled-normalize
+npm install styled-components @types/styled-components styled-normalize gh-pages
 ```
 
 ## 참고
