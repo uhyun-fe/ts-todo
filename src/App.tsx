@@ -1,23 +1,146 @@
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+
+// Utils
+import { getItem, setItem } from "./utils/localStorage";
 
 // Components
 import ClockBox from "./components/ClockBox";
+import TodoItem from "./components/TodoItem";
+import TodoAddBox from "./components/TodoAddBox";
+import TodoUpdateBox from "./components/TodoUpdateBox";
+
+// Images
+import plusIcon from "./assets/icons/plus.png";
+
+const LOCAL_KEY = "todolist";
+
+interface Istate {
+   adding: boolean;
+   updating: boolean;
+   update_id: number;
+}
 
 function App() {
+   const [todoList, setTodoList] = useState<string[]>([]);
+   const [state, setState] = useState<Istate>({
+      adding: false,
+      updating: false,
+      update_id: 0,
+   });
+
+   useEffect(() => {
+      setTodoList(JSON.parse(getItem(LOCAL_KEY)) || []);
+   }, []);
+
+   // 등록 or 수정 박스 닫기
+   const closing = () => {
+      setState({ ...state, adding: false, updating: false, update_id: 0 });
+   };
+
+   // 할일 등록
+   const handleAdd = (value: string) => {
+      if (!value) return;
+      setItem({ key: LOCAL_KEY, value: JSON.stringify(todoList.concat(value)) });
+      setTodoList(todoList.concat(value));
+      closing();
+   };
+
+   // 할일 수정
+   const handleUpdate = (index: number, value: string) => {
+      console.log(index, value);
+
+      if (!value) return;
+      setItem({ key: LOCAL_KEY, value: JSON.stringify(todoList.map((t, i) => (i === index ? value : t))) });
+      setTodoList(todoList.map((t, i) => (i === index ? value : t)));
+      closing();
+   };
+
+   // 할일 삭제
+   const handleDelete = (index: number) => {
+      setItem({ key: LOCAL_KEY, value: JSON.stringify(todoList.filter((t, i) => i !== index)) });
+      setTodoList(todoList.filter((t, i) => i !== index));
+   };
+
    return (
-      <Container>
+      <Container is_display={!state.adding && !state.updating}>
          <ClockBox />
+         <TodoList>
+            {todoList.length ? (
+               todoList.map((todo, index) => (
+                  <TodoItem
+                     key={index}
+                     index={index}
+                     item={todo}
+                     updateItem={(index) => setState({ ...state, updating: true, update_id: index })}
+                     deleteItem={handleDelete}
+                  />
+               ))
+            ) : (
+               <Guide onClick={() => setState({ ...state, adding: true })}>새로운 할 일을 등록해보세요!</Guide>
+            )}
+         </TodoList>
+         <PlusButton onClick={() => setState({ ...state, adding: true })} />
+         <TodoAddBox adding={state.adding} addTask={handleAdd} closing={closing} />
+         <TodoUpdateBox
+            updating={state.updating}
+            item={todoList[state.update_id]}
+            item_id={state.update_id}
+            updateTask={handleUpdate}
+            closing={closing}
+         />
       </Container>
    );
 }
 
 export default App;
 
-const Container = styled.div`
+interface Istyle {
+   is_display: boolean;
+}
+
+const Container = styled.div<Istyle>`
+   display: flex;
+   flex-direction: column;
+   align-items: center;
    margin: 0 auto;
    padding: 20px 0;
-   width: 80%;
+   position: relative;
+   width: 100%;
    max-width: 500px;
    height: 100vh;
-   /* background: rgba(0, 0, 0, 0.1); */
+   border: 1px solid #eaeaea;
+   border-width: 0 1px;
+   text-align: center;
+   background: ${(props) => (props.is_display ? "#fff" : "rgba(0, 0, 0, 0.1)")};
+   transition: 0.6s ease-in-out;
+`;
+
+const TodoList = styled.div`
+   width: 100%;
+   max-height: 67%;
+   overflow-x: hidden;
+   overflow-y: auto;
+`;
+
+const Guide = styled.span`
+   display: block;
+   padding: 30px 0;
+   color: var(--main);
+   font-weight: 300;
+   cursor: pointer;
+`;
+
+const PlusButton = styled.button`
+   position: absolute;
+   bottom: 20px;
+   width: 70px;
+   height: 70px;
+   border: none;
+   border-radius: 50%;
+   background: url(${plusIcon}) no-repeat;
+   background-size: 50% 50%;
+   background-position: 52% 49%;
+   background-color: var(--main);
+   /* box-shadow: 0 0 5px 1px var(--main); */
 `;

@@ -25,6 +25,13 @@ const ClockBox = () => {
    });
 
    useEffect(() => {
+      setClock();
+      setInterval(() => {
+         setClock();
+      }, 10000);
+   }, []);
+
+   const setClock = () => {
       let now: Date = new Date();
       setDate({
          ...date,
@@ -35,7 +42,7 @@ const ClockBox = () => {
          hour: addZero(now.getHours()),
          minute: addZero(now.getMinutes()),
       });
-   }, []);
+   };
 
    function addZero(num: number) {
       return num < 10 ? "0" + num : "" + num;
@@ -66,7 +73,9 @@ const Container = styled.section`
    display: flex;
    justify-content: space-between;
    align-items: center;
-   padding-top: 20px;
+   margin-bottom: 50px;
+   padding: 20px 50px 0;
+   width: 100%;
 `;
 
 const Left = styled.div`
@@ -89,7 +98,7 @@ const Left = styled.div`
 
 const DateNum = styled.span`
    margin-right: 5px;
-   color: #ff7e36;
+   color: var(--main);
    font-size: 2.5em;
 `;
 

@@ -5,6 +5,10 @@ import { normalize } from "styled-normalize";
 const GlobalStyle = createGlobalStyle`
   ${normalize}
 
+  :root {
+    --main: #ff7e36;
+  }
+
   @font-face {
     font-family: 'GmarketSans';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff') format('woff');
@@ -38,6 +42,11 @@ const GlobalStyle = createGlobalStyle`
 
   * {
     box-sizing: border-box;
+  }
+
+  button {
+    cursor: pointer;
+    outline: none;
   }
 `;
 
