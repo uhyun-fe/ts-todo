@@ -21,8 +21,13 @@ interface Istate {
    update_id: number;
 }
 
+export interface Itodo {
+   text: string;
+   checked: boolean;
+}
+
 function App() {
-   const [todoList, setTodoList] = useState<string[]>([]);
+   const [todoList, setTodoList] = useState<Itodo[]>([]);
    const [state, setState] = useState<Istate>({
       adding: false,
       updating: false,
@@ -41,19 +46,26 @@ function App() {
    // 할일 등록
    const handleAdd = (value: string) => {
       if (!value) return;
-      setItem({ key: LOCAL_KEY, value: JSON.stringify(todoList.concat(value)) });
-      setTodoList(todoList.concat(value));
+      const arr = todoList.concat({ text: value, checked: false });
+      setItem({ key: LOCAL_KEY, value: JSON.stringify(arr) });
+      setTodoList(arr);
       closing();
    };
 
-   // 할일 수정
+   // 할일 텍스트 수정
    const handleUpdate = (index: number, value: string) => {
-      console.log(index, value);
-
       if (!value) return;
-      setItem({ key: LOCAL_KEY, value: JSON.stringify(todoList.map((t, i) => (i === index ? value : t))) });
-      setTodoList(todoList.map((t, i) => (i === index ? value : t)));
+      const arr = todoList.map((t, i) => (i === index ? { ...t, text: value } : t));
+      setItem({ key: LOCAL_KEY, value: JSON.stringify(arr) });
+      setTodoList(arr);
       closing();
+   };
+
+   // 할일 체크 or 해제
+   const handleCheck = (index: number) => {
+      const arr = todoList.map((t, i) => (i === index ? { ...t, checked: !t.checked } : t));
+      setItem({ key: LOCAL_KEY, value: JSON.stringify(arr) });
+      setTodoList(arr);
    };
 
    // 할일 삭제
@@ -72,6 +84,7 @@ function App() {
                      key={index}
                      index={index}
                      item={todo}
+                     checkItem={handleCheck}
                      updateItem={(index) => setState({ ...state, updating: true, update_id: index })}
                      deleteItem={handleDelete}
                   />
@@ -84,7 +97,7 @@ function App() {
          <TodoAddBox adding={state.adding} addTask={handleAdd} closing={closing} />
          <TodoUpdateBox
             updating={state.updating}
-            item={todoList[state.update_id]}
+            item={todoList.length ? todoList[state.update_id].text : ""}
             item_id={state.update_id}
             updateTask={handleUpdate}
             closing={closing}
