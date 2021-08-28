@@ -13,7 +13,7 @@ import TodoUpdateBox from "./components/TodoUpdateBox";
 // Images
 import plusIcon from "./assets/icons/plus.png";
 
-const LOCAL_KEY = "todolist";
+const LOCAL_KEY = "ts_todo";
 
 interface Istate {
    adding: boolean;

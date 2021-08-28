@@ -71,6 +71,9 @@ const TextBox = styled.div`
       width: 13px;
       height: 13px;
    }
+   del {
+      color: #afafaf;
+   }
 `;
 
 interface Istyle {
